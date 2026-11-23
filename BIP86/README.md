@@ -2,9 +2,23 @@
 
 完整说明及命令见[仓库主 README](../README.md)和[英文说明](../README.en.md#bip86-bipartite-graphs-converted-from-scp)。
 
-47 个输入包括 Umetani 的 I—N 系列 30 个、OR-Library 的 NRG/NRH 系列 10 个以及 RAIL 系列 7 个。原始矩阵未随仓库发布，请从主 README 中的来源下载并放入本目录的 `scp/`。
+47 个输入包括 Umetani 的 I—N 系列 30 个、OR-Library 的 NRG/NRH 系列 10 个以及 RAIL 系列 7 个。Git 代码树不存放这些大型输入文件；Release `scp-inputs-v1` 单独提供[本次核验所用的 47 个文件快照](https://github.com/Fate-Hermit/PUC-STP-Extensions/releases/download/scp-inputs-v1/scp-inputs-v1.zip)，用于保留所用输入版本。
 
-输入必须是按行稀疏 SCP 格式：`m n`、`n` 个列成本、逐行的关联列数及 1 起始列号。本次 47 个已核验文件均为此格式。OR-Library 官网的 RAIL 原始下载采用按列格式，需要先转成按行格式，不能直接交给本解析器。请核对来源 SHA256。
+从仓库根目录下载并解压到 `BIP86/`：
+
+```bash
+curl -fL https://github.com/Fate-Hermit/PUC-STP-Extensions/releases/download/scp-inputs-v1/scp-inputs-v1.zip -o scp-inputs-v1.zip
+python3 -m zipfile -e scp-inputs-v1.zip BIP86
+
+# Linux/WSL：核对每个输入文件
+(cd BIP86 && sha256sum -c SHA256SUMS)
+```
+
+压缩包包含 `scp/` 下的 47 个输入文件、`SHA256SUMS` 和 `SNAPSHOT.md`。解压后得到 `BIP86/scp/`，可直接接下面的转换命令。Windows PowerShell 使用 `curl.exe` 和实际 Python 解释器；也可手动下载后将压缩包内容解压到 `BIP86/`。
+
+原始提供方与论文链接见主 README。输入矩阵不属于本项目原创数据；Release 快照保留来源说明，不为它们另行授予新许可证，使用和再分发须遵守原始数据提供方的条件。
+
+输入必须是按行稀疏 SCP 格式：`m n`、`n` 个列成本、逐行的关联列数及 1 起始列号。本次快照中的 47 个已核验文件均为此格式，**其中 RAIL 是本地行式副本**。OR-Library 官网的 RAIL 原始下载采用按列格式，需要先转成按行格式，不能直接交给本解析器。请核对来源 SHA256。
 
 本文档的数量与连通性结论针对该哈希清单中的本地行式输入。仓库未包含从官网 RAIL 列式原件生成这些输入的预处理步骤，也未独立验证预处理前后矩阵逐项一致。
 

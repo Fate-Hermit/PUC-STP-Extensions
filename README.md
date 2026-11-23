@@ -6,7 +6,7 @@
 
 [English documentation](README.en.md)
 
-本仓库发布生成器、配置及来源核验清单，不包含大型 STP 输出或原始 SCP 矩阵。
+本仓库代码树发布生成器、配置及来源核验清单，不放置大型 STP 输出或 SCP 矩阵；本次核验所用的 47 个 SCP 输入文件快照通过 GitHub Release 单独提供。
 
 ## 1. 数据集概览
 
@@ -47,7 +47,7 @@ PUC-STP-Extensions/
 │   ├── test_converter.py
 │   ├── source_connectivity.csv
 │   ├── source_files.sha256
-│   └── scp/                 # 自行下载的原始 SCP 矩阵，不随仓库镜像发布
+│   └── scp/                 # 从 Release 输入快照解压得到，不提交到代码树
 │       ├── scpi1.txt
 │       ├── scpnrg1.txt
 │       └── rail507.txt
@@ -193,7 +193,23 @@ BIP 使用 `RANDOM_MASTER_SEED = 20261023`。每个 SCP 来源标识与主种子
 | RAIL516、RAIL2586、RAIL4284、RAIL4872 | 4 | **0** | 转换后终端不连通，默认隔离 U/P 共 8 个文件 |
 | **合计** | **47** | **86** | **43 个有效 SCP 来源，每个来源生成一对 U/P** |
 
-原始矩阵下载地址及论文见第 8 节。下载 I—N 系列（30 个）与 OR-Library 的 NRG/NRH、RAIL（17 个），按上面结构放入 `BIP86/scp/`；无需重新压缩。本转换器读取按行稀疏格式：先写 `m n`、再写 `n` 个列成本，随后逐行写关联列数与 1 起始列号。本次核验的 47 个文件均采用此格式。**注意：OR-Library 官网的原始 RAIL 文件采用按列格式，不能原样输入；须先在不改变关联矩阵的前提下转为上述按行格式。**建议核对 [`source_files.sha256`](BIP86/source_files.sha256)，确保来源与本次验证相同；Umetani 页面提供的 [SCP 数据包入口](https://drive.google.com/file/d/17im3dxfYdiGO2bUtJxX08kuyimIdsJ7d/view)见原作者数据页面。本文档的 43/47 可行数量与 RAIL 分量数结论针对哈希清单所列的本地行式输入；本仓库不包含 RAIL 从官网列式原件转为行式输入的预处理步骤，未独立核验两者的逐项矩阵等价性。**发布生成器时不应把 47 个原始 SCP 文件误称为本项目原创数据**；如计划一同镜像发布原始数据，需遵守原始数据提供方的使用和再分发条件。
+原始矩阵的提供方与论文见第 8 节：I—N 系列（30 个）来自 Umetani，NRG/NRH 与 RAIL（17 个）来自 OR-Library。为保留本次使用的输入版本，Release `scp-inputs-v1` 提供 [47 个 SCP 输入文件快照（scp-inputs-v1.zip）](https://github.com/Fate-Hermit/PUC-STP-Extensions/releases/download/scp-inputs-v1/scp-inputs-v1.zip)。压缩包包含 `scp/` 下的 47 个文件、`SHA256SUMS` 和说明来源及格式的 `SNAPSHOT.md`；它们不放入 Git 代码树。
+
+从仓库根目录下载并解压到 `BIP86/`，即可直接使用第 5.4 节的 `--scp-dir ./BIP86/scp` 命令：
+
+```bash
+curl -fL https://github.com/Fate-Hermit/PUC-STP-Extensions/releases/download/scp-inputs-v1/scp-inputs-v1.zip -o scp-inputs-v1.zip
+python3 -m zipfile -e scp-inputs-v1.zip BIP86
+
+# Linux/WSL：核对压缩包内每个输入文件的 SHA256
+(cd BIP86 && sha256sum -c SHA256SUMS)
+```
+
+Windows PowerShell 可将 `curl` 换为 `curl.exe`、`python3` 换为实际 Python 解释器。也可通过上述链接手动下载，将压缩包内容解压到 `BIP86/`，得到 `BIP86/scp/`。代码树中的 [`source_files.sha256`](BIP86/source_files.sha256) 也记录这 47 个输入的哈希。
+
+本转换器读取按行稀疏格式：先写 `m n`、再写 `n` 个列成本，随后逐行写关联列数与 1 起始列号。快照中的 47 个文件均为本次核验所用的本地行式输入，**其中 RAIL 是本地行式副本；OR-Library 官网的 RAIL 原始下载采用按列格式，不能原样输入本转换器。**本文档的 43/47 可行数量与 RAIL 分量数结论针对快照及哈希清单所列文件；本仓库不包含 RAIL 从官网列式原件转为行式输入的预处理步骤，未独立核验两者的逐项矩阵等价性。如从原提供方重新获取文件，须准备相同的行式输入并核对哈希；Umetani 页面提供的 [SCP 数据包入口](https://drive.google.com/file/d/17im3dxfYdiGO2bUtJxX08kuyimIdsJ7d/view)见原作者数据页面。
+
+47 个 SCP 输入来自上述原始数据提供方，**不属于本项目原创数据**。Release 快照保留这些来源说明，不为源矩阵另行授予新许可证；使用和再分发须遵守原始数据提供方的条件。
 
 ### 5.3 BIP 特别注意事项：不连通的 RAIL 源实例
 

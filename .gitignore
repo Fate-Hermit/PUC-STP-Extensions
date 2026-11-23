@@ -9,5 +9,6 @@ __pycache__/
 /instances/
 /BIP86/scp/
 scp.zip
+scp-inputs-*.zip
 .DS_Store
 Thumbs.db

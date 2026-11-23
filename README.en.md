@@ -24,10 +24,12 @@ the Python standard library. The optional `--cover-method exact` mode in
 `MCC50/generate_cc.py` additionally requires NumPy/SciPy; the MCC50 batch driver
 does not use this mode.
 
-The repository contains generator source, configuration templates and source
-verification records. Large generated STP files and third-party SCP matrices
-are not included. Run the following commands from the repository root. On
-Windows, replace `python3` with your Python interpreter as needed.
+The Git source tree contains generator source, configuration templates and
+source verification records. Large generated STP files and SCP matrices are
+kept out of that tree. A separate GitHub Release provides a snapshot of the
+47 SCP input files used for the checks below. Run the following commands from
+the repository root. On Windows, replace `python3` with your Python interpreter
+as needed.
 
 ## MHC16: binary hypercubes
 
@@ -78,8 +80,26 @@ nonzero becomes an undirected edge. Original SCP column costs are ignored.
 No edges are added to force connectivity. Unperturbed edge costs are 1;
 perturbed costs are integers in `[100,110]`.
 
-Obtain the following source files from their original providers and put them
-under `BIP86/scp/`:
+To use the exact input files checked here, download the
+[SCP input snapshot (scp-inputs-v1.zip)](https://github.com/Fate-Hermit/PUC-STP-Extensions/releases/download/scp-inputs-v1/scp-inputs-v1.zip)
+from Release `scp-inputs-v1`. The archive contains 47 files under `scp/`,
+`SHA256SUMS`, and `SNAPSHOT.md` with source and format notes. Extract it into
+`BIP86/` from the repository root so the commands below can read `BIP86/scp/`:
+
+```bash
+curl -fL https://github.com/Fate-Hermit/PUC-STP-Extensions/releases/download/scp-inputs-v1/scp-inputs-v1.zip -o scp-inputs-v1.zip
+python3 -m zipfile -e scp-inputs-v1.zip BIP86
+
+# Linux/WSL: check the SHA256 of each input file.
+(cd BIP86 && sha256sum -c SHA256SUMS)
+```
+
+In Windows PowerShell, use `curl.exe` in place of `curl` and your Python
+interpreter in place of `python3`. You can also download the linked archive
+manually and extract its contents into `BIP86/` to obtain `BIP86/scp/`.
+
+The input matrices originate from the following providers; the snapshot
+preserves the versions used here rather than claiming them as original data:
 
 - Umetani classes I–N: `scpi1.txt`–`scpn5.txt`, five per class (30 files).
 - OR-Library NRG and NRH: five per class (10 files).
@@ -88,14 +108,20 @@ under `BIP86/scp/`:
 
 The converter requires **row-oriented sparse SCP text**: `m n`, then `n`
 column costs, followed by each row's cardinality and 1-based column indices.
-All 47 checked local inputs use this format. The original RAIL downloads from
-OR-Library are **column-oriented** and cannot be passed to this parser directly;
-they must first be reformatted without changing the incidence matrix. Umetani's
-data page links to an [SCP archive](https://drive.google.com/file/d/17im3dxfYdiGO2bUtJxX08kuyimIdsJ7d/view).
-Use the source hashes to check that your files match the inputs verified here.
-The connectivity counts below refer to those exact local row-format inputs.
-This repository does not include the RAIL preprocessing step or an independent
-matrix-equivalence check against the original column-format downloads.
+All 47 checked local inputs in the snapshot use this format. **Its RAIL files
+are local row-format copies.** The original RAIL downloads from OR-Library are
+**column-oriented** and cannot be passed to this parser directly; they must first
+be reformatted without changing the incidence matrix. Umetani's data page links
+to an [SCP archive](https://drive.google.com/file/d/17im3dxfYdiGO2bUtJxX08kuyimIdsJ7d/view).
+If obtaining files from the original providers, prepare matching row-format
+inputs and check the source hashes. The connectivity counts below refer to the
+exact local files in the snapshot and hash list. This repository does not include
+the RAIL preprocessing step or an independent matrix-equivalence check against
+the original column-format downloads.
+
+The source matrices remain attributed to their original providers. The Release
+snapshot does not grant a new license for those matrices; the original providers'
+use and redistribution conditions apply.
 
 The 47 source matrices have all been parsed and checked. Four RAIL matrices
 convert to graphs whose terminals lie in multiple connected components:
